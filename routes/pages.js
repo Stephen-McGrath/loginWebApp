@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth');
 
-// *******   Add Pages here to load  *************
+            // *******   Add Pages here to load  *************
 
 router.get('/', authController.isLoggedIn, (req, res) => {
     res.render('index', {
@@ -26,8 +26,8 @@ router.get('/profile', authController.isLoggedIn, (req, res)=>{   // authControl
         });  
     }else{
         res.redirect('/login');
-    }
-    
+    } 
+     
 })
-
+ 
 module.exports = router;

@@ -2,6 +2,7 @@ const mysql = require("mysql");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { promisify } = require ('util');
+const expressValidator = require('express-validator');
 
 
 
@@ -18,7 +19,7 @@ const db = mysql.createConnection({
 
 exports.login = async (req, res) => {
     try {
-        const {email, password } = req.body;
+        const {email, password,} = req.body;
 
         if( !email || !password) {
             return res.status(400).render('login', {
@@ -34,25 +35,26 @@ exports.login = async (req, res) => {
             if( !results || !(await bcrypt.compare(password, results[0].password)) ) {
                 res.status(401).render('login', {
                     message: 'Email or Password is Incorrect'
-                })
-            } else {
+                }) 
+            }else {   
                 const id = results[0].id;
 
                 const token = jwt.sign({ id }, process.env.JWT_SECRET, {
-                    expiresIn: process.env.JWT_EXPIRES_IN
+                    expiresIn: process.env.JWT_EXPIRES_IN 
                 });
 
                 console.log("The token is: " + token);
 
                 const cookieOptions = {
-                    exoires: new Date(
+                    expires: new Date(
                         Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
                     ),
-                    httpOnly: true
+                    httpOnly: true 
                 }
 
                 res.cookie('jwt', token, cookieOptions );
                 res.status(200).redirect("/profile");
+                
  
             }
     
@@ -66,15 +68,17 @@ exports.login = async (req, res) => {
     }
 
     
-
+                    // ************    Register User    ************ //
 
 exports.register = (req, res) => {
     console.log(req.body);
 
-
     const { name, email, password, passwordConfirm } = req.body;
 
+
     db.query('SELECT email FROM users WHERE email = ?', [email], async (error, results) => {
+
+
         if(error) {
             console.log(error);
         }
@@ -83,10 +87,15 @@ exports.register = (req, res) => {
             return res.render('register', {
                 message: 'That email is already registered'
             })
-        } else if( password !== passwordConfirm ) {
+        }else if( password !== passwordConfirm ) {
             return res.render('register', {
                 message: 'Passwords Do Not Match'
             });
+
+        
+        
+        
+        X
         }
 
         let hashedPassword = await bcrypt.hash(password, 8);
@@ -101,18 +110,15 @@ exports.register = (req, res) => {
                 });
             }
         } )
-
-        
-
-
-
-
+  
 
     });
 
     //res.send("Form Submitted")
 }
 
+
+    // *************   Check to see if user is logged in already  *******************
 exports.isLoggedIn = async (req, res, next) => {
     console.log(req.cookies);
     if(req.cookies.jwt) {
@@ -142,7 +148,9 @@ exports.isLoggedIn = async (req, res, next) => {
     }                               //  (pages.js) router.get('/profile', authController.isLoggedIn, (req, res)=>                                      
 }     
 
-exports.logout = async (req, res,) => {
+
+            // *********** logout user and remove cookie *************
+    exports.logout = async (req, res,) => {
     res.cookie('jwt', 'logout', {
         expires: new Date(Date.now() + 2*1000),
         httpOnly: true
@@ -150,3 +158,5 @@ exports.logout = async (req, res,) => {
 
     res.status(200).redirect('/');
 }
+
+ 

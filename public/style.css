@@ -1,5 +1,5 @@
 nav {
-    background-color: blueviolet;
+    background-color: black;
     color: white;
     padding: 30px 60px;
     display: flex;
@@ -26,6 +26,11 @@ nav li a {
 nav li a:hover {
     color: yellow;
     text-decoration: none;
+}
+
+.btn-primary {
+    background-color: black;
+    text-align: center;
 }
 
 .avatar-ctn {
